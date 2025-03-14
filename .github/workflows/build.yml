@@ -1,0 +1,77 @@
+name: Build Flutter App
+
+on:
+  push:
+    branches:
+      - main
+      - app  # Change this branch if needed
+
+jobs:
+  build:
+    name: Build Flutter App for Multiple Platforms
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.16.0"  # Change this to match the required Flutter version
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # --- Android Build ---
+      - name: Build Android APK
+        run: flutter build apk --release
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      # --- iOS Build (MacOS required) ---
+      - name: Build iOS IPA
+        if: runner.os == 'macOS'
+        run: flutter build ios --no-codesign
+      - name: Upload iOS Artifact
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: build/ios/iphoneos
+
+      # --- macOS Build ---
+      - name: Build macOS App
+        if: runner.os == 'macOS'
+        run: flutter build macos
+      - name: Upload macOS Artifact
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-app
+          path: build/macos/Build/Products/Release
+
+      # --- Windows Build ---
+      - name: Build Windows EXE
+        if: runner.os == 'Windows'
+        run: flutter build windows
+      - name: Upload Windows Artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: build/windows/runner/Release
+
+      # --- Debian Build (Linux) ---
+      - name: Build Linux Deb
+        if: runner.os == 'Linux'
+        run: flutter build linux
+      - name: Upload Debian Artifact
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-deb
+          path: build/linux/x64/release/bundle

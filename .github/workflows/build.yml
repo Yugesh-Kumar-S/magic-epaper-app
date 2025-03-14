@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - app  # Change this branch if needed
+      - app
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.16.0"  # Change this to match the required Flutter version
+          flutter-version: "3.16.0" 
 
       - name: Install Dependencies
         run: flutter pub get
